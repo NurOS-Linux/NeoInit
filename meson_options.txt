@@ -1,0 +1,2 @@
+option('systemd_compat', type : 'boolean', value : true,
+  description : 'Build systemd unit file compatibility parser')

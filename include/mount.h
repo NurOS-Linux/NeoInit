@@ -1,0 +1,21 @@
+// SPDX-FileCopyrightText: 2026 AnmiTaliDev <anmitalidev@nuros.org>
+// SPDX-License-Identifier: GPL-3.0-only
+// https://github.com/NurOS-Linux/neoinit
+
+#pragma once
+
+#include <stddef.h>
+
+typedef struct {
+    const char   *source;
+    const char   *target;
+    const char   *fstype;
+    unsigned long flags;
+    const char   *data;
+} mount_entry_t;
+
+int mount_essential(void);
+int unmount_all(void);
+
+const mount_entry_t *mount_table_get(void);
+size_t mount_table_count(void);
