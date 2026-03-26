@@ -4,6 +4,7 @@
 
 #include "reap.h"
 #include "log.h"
+#include "registry.h"
 
 #include <string.h>
 #include <sys/wait.h>
@@ -59,10 +60,14 @@ int reap_zombies(void) {
 
     while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
         const char *name = find_name(pid);
+        
         if (WIFEXITED(status))
             log_info("reaped %s [%d] exit=%d", name, (int)pid, WEXITSTATUS(status));
         else if (WIFSIGNALED(status))
             log_warn("reaped %s [%d] signal=%d", name, (int)pid, WTERMSIG(status));
+        
+        registry_update_pid(pid, 0);
+        
         reap_untrack(pid);
         reaped++;
     }

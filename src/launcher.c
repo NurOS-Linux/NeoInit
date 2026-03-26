@@ -7,6 +7,7 @@
 #include "reap.h"
 
 #include <errno.h>
+#include <paths.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/wait.h>
@@ -25,9 +26,17 @@ pid_t service_launch(const service_def_t *def) {
     }
 
     if (pid == 0) {
-        if (def->working_dir && chdir(def->working_dir) < 0) {
-            /* non-fatal: log and continue */
+        /* Set a basic PATH if not present in env */
+        if (!getenv("PATH")) {
+#ifdef DEFAULT_PATH
+            setenv("PATH", DEFAULT_PATH, 1);
+#else
+            setenv("PATH", _PATH_STDPATH, 1);
+#endif
         }
+
+        if (def->working_dir && chdir(def->working_dir) < 0)
+            log_warn("chdir %s: %s", def->working_dir, strerror(errno));
 
         if (def->env) {
             for (int i = 0; def->env[i]; i++)

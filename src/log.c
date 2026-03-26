@@ -43,7 +43,7 @@ void log_msg(log_level_t level, const char *fmt, ...) {
                           kmsg_prio[level], buf);
         if (kn > 0)
             write(kmsg_fd, kmsg, (size_t)kn);
-    } else {
-        fprintf(stderr, "neoinit [%s]: %s\n", level_tag[level], buf);
     }
+    
+    fprintf(stderr, "neoinit [%s]: %s\n", level_tag[level], buf);
 }

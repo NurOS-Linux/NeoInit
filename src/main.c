@@ -2,26 +2,58 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // https://github.com/NurOS-Linux/neoinit
 
+#include "control.h"
 #include "launcher.h"
 #include "log.h"
 #include "mount.h"
 #include "reap.h"
+#include "registry.h"
 #include "service.h"
 #include "signal_handler.h"
 
+#include <errno.h>
+#include <poll.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/reboot.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
-#define SERVICES_DIR "/etc/neoinit/services"
+#ifdef ENABLE_CONTAINER_DETECTION
+static int is_container(void) {
+    return (getenv("container") != NULL);
+}
+#endif
 
 static void do_halt(int cmd) {
     log_info("shutting down");
     sync();
+
+#ifdef ENABLE_CONTAINER_DETECTION
+    if (is_container()) {
+        log_info("container environment detected, exiting gracefully");
+        log_close();
+        exit(0);
+    }
+#endif
+
     unmount_all();
     log_close();
     reboot(cmd);
+}
+
+static void on_service_restart(service_entry_t *ent) {
+    log_info("restarting service: %s", ent->def->name);
+    usleep(100000); /* 100ms throttle */
+    pid_t pid = service_launch(ent->def);
+    if (pid > 0) {
+        log_info("restarted %s [pid %d]", ent->def->name, (int)pid);
+        ent->pid = pid;
+        ent->running = 1;
+    } else {
+        log_err("failed to restart %s", ent->def->name);
+    }
 }
 
 int main(void) {
@@ -35,28 +67,53 @@ int main(void) {
 
     signals_setup();
     mount_essential();
+    registry_init();
 
-    service_def_t **services = NULL;
-    int count = service_load_dir(SERVICES_DIR, &services);
+    int ctrl_fd = control_init();
+
+    service_def_t **defs = NULL;
+    int count = service_load_dir(SERVICES_DIR, &defs);
     if (count > 0) {
-        services_launch_all(services, count);
-        for (int i = 0; i < count; i++)
-            service_free(services[i]);
-        free(services);
+        for (int i = 0; i < count; i++) {
+            registry_add(defs[i]);
+            pid_t pid = service_launch(defs[i]);
+            if (pid > 0) {
+                service_entry_t *ent = registry_find(defs[i]->name);
+                if (ent) {
+                    ent->pid = pid;
+                    ent->running = 1;
+                }
+            }
+        }
+        free(defs);
     }
 
     log_info("entering main loop");
 
-    for (;;) {
-        pause();
+    struct pollfd fds[1];
+    fds[0].fd     = ctrl_fd;
+    fds[0].events = POLLIN;
 
+    sigset_t sigmask;
+    sigemptyset(&sigmask);
+
+    for (;;) {
+        int n = ppoll(fds, 1, NULL, &sigmask);
+        if (n < 0) {
+            if (errno == EINTR) goto check_signals;
+            continue;
+        }
+
+        if (fds[0].revents & POLLIN)
+            control_handle_data(ctrl_fd);
+
+    check_signals:
         if (g_do_reap) {
             g_do_reap = 0;
             reap_zombies();
+            registry_check_restarts(on_service_restart);
         }
-        if (g_do_shutdown)
-            do_halt(RB_POWER_OFF);
-        if (g_do_reboot)
-            do_halt(RB_AUTOBOOT);
+        if (g_do_shutdown) do_halt(RB_POWER_OFF);
+        if (g_do_reboot)   do_halt(RB_AUTOBOOT);
     }
 }

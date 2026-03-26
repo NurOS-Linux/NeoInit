@@ -11,11 +11,10 @@ typedef struct {
     const char   *target;
     const char   *fstype;
     unsigned long flags;
-    const char   *data;
 } mount_entry_t;
 
-int mount_essential(void);
-int unmount_all(void);
+void mount_essential(void);
+void unmount_all(void);
 
 const mount_entry_t *mount_table_get(void);
 size_t mount_table_count(void);

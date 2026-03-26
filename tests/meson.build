@@ -16,8 +16,8 @@ endif
 
 foreach name, cfg : tests
   exe = executable(name, cfg['src'],
-    c_args             : cfg['cargs'],
-    link_with          : neoinit_lib,
+    c_args              : cfg['cargs'],
+    link_with           : neoinit_lib,
     include_directories : tests_inc,
   )
   test(name, exe)

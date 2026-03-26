@@ -1,31 +1,27 @@
-neoinit_c_args = []
-
-neoinit_sources = files(
+# Core logic for testing
+neoinit_lib_sources = files(
+  'launcher.c',
   'log.c',
   'mount.c',
   'reap.c',
-  'signal_handler.c',
   'service.c',
+  'service_sd.c',
   'service_yaml.c',
-  'launcher.c',
+  'signal_handler.c',
+  'control.c',
+  'registry.c'
 )
 
-if get_option('systemd_compat')
-  neoinit_sources += files('service_sd.c')
-  neoinit_c_args  += '-DNEOINIT_SYSTEMD_COMPAT'
-endif
-
-neoinit_lib = static_library('neoinit',
-  neoinit_sources,
-  c_args             : neoinit_c_args,
+neoinit_lib = static_library('neoinit_lib',
+  neoinit_lib_sources,
   include_directories : neoinit_inc,
+  install : false
 )
 
+# Main executable
 executable('neoinit',
   'main.c',
-  c_args             : neoinit_c_args,
-  link_with          : neoinit_lib,
+  link_with           : neoinit_lib,
   include_directories : neoinit_inc,
-  install            : true,
-  install_dir        : '/sbin',
+  install             : true
 )

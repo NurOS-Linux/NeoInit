@@ -1,0 +1,42 @@
+// SPDX-FileCopyrightText: 2026 AnmiTaliDev <anmitalidev@nuros.org>
+// SPDX-License-Identifier: GPL-3.0-only
+// https://github.com/NurOS-Linux/neoinit
+
+#include "client.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define NEOINIT_SOCK_PATH "/run/neoinit.sock"
+
+static void usage(const char *progname) {
+    fprintf(stderr, "Usage: %s <command> [service]\n\n", progname);
+    fprintf(stderr, "Commands:\n");
+    fprintf(stderr, "  status         Check if neoinit is alive\n");
+    fprintf(stderr, "  list           List all services and their state\n");
+    fprintf(stderr, "  start <name>   Launch a service\n");
+    fprintf(stderr, "  stop <name>    Stop a running service\n");
+    fprintf(stderr, "  restart <name> Restart a service\n");
+}
+
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        usage(argv[0]);
+        return 1;
+    }
+
+    char cmd_line[512];
+    if (argc > 2)
+        snprintf(cmd_line, sizeof(cmd_line), "%s %s", argv[1], argv[2]);
+    else
+        snprintf(cmd_line, sizeof(cmd_line), "%s", argv[1]);
+
+    char buf[4096];
+    if (servctl_run_command(NEOINIT_SOCK_PATH, cmd_line, buf, sizeof(buf)) < 0) {
+        fprintf(stderr, "Error: Could not communicate with neoinit at %s\n", NEOINIT_SOCK_PATH);
+        return 1;
+    }
+
+    printf("%s", buf);
+    return 0;
+}

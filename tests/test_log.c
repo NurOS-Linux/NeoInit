@@ -11,12 +11,9 @@ int main(void) {
     log_warn("test warn");
     log_err("test err");
     log_close();
-
     log_close();
-    CHECK(1);
 
     log_msg(LOG_LEVEL_INFO, "after close: %s", "ok");
-    CHECK(1);
 
     TEST_DONE();
 }

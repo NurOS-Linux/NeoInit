@@ -1,2 +1,11 @@
 option('systemd_compat', type : 'boolean', value : true,
   description : 'Build systemd unit file compatibility parser')
+
+option('default_path', type : 'string', value : '',
+  description : 'Default PATH for services if not set in environment (empty means use system default)')
+
+option('services_dir', type : 'string', value : '/etc/neoinit/services',
+  description : 'Directory to scan for service definitions')
+
+option('container_detection', type : 'boolean', value : true,
+  description : 'Enable detection of container environments to skip reboot/umount')
