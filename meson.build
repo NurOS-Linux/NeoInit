@@ -20,6 +20,10 @@ if get_option('container_detection')
   add_project_arguments('-DENABLE_CONTAINER_DETECTION', language : 'c')
 endif
 
+if get_option('systemd_compat')
+  add_project_arguments('-DNEOINIT_SYSTEMD_COMPAT', language : 'c')
+endif
+
 neoinit_inc = include_directories('include')
 
 subdir('src')
