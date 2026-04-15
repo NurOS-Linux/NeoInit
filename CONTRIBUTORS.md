@@ -4,4 +4,4 @@
 
 | Name         | Contact                       | Role   |
 |--------------|-------------------------------|--------|
-| AnmiTaliDev  | anmitalidev@nuros.org         | Author |
+| AnmiTaliDev  | anmitalidev@nuros.org         | Maintainer |
