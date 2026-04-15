@@ -16,8 +16,10 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/reboot.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 #ifdef ENABLE_CONTAINER_DETECTION
@@ -77,11 +79,29 @@ int main(void) {
         for (int i = 0; i < count; i++) {
             registry_add(defs[i]);
             pid_t pid = service_launch(defs[i]);
+            service_entry_t *ent = NULL;
             if (pid > 0) {
-                service_entry_t *ent = registry_find(defs[i]->name);
+                ent = registry_find(defs[i]->name);
                 if (ent) {
                     ent->pid = pid;
                     ent->running = 1;
+                }
+            }
+
+            if (defs[i]->type == SERVICE_TYPE_ONESHOT && pid > 0) {
+                int status;
+                waitpid_t:
+                if (waitpid(pid, &status, 0) < 0) {
+                    if (errno == EINTR) goto waitpid_t;
+                    log_err("waitpid %s: %s", defs[i]->name, strerror(errno));
+                }
+                if (WIFEXITED(status))
+                    log_info("%s exited with %d", defs[i]->name, WEXITSTATUS(status));
+                else if (WIFSIGNALED(status))
+                    log_warn("%s killed by signal %d", defs[i]->name, WTERMSIG(status));
+                if (ent) {
+                    ent->running = 0;
+                    ent->pid = -1;
                 }
             }
         }
