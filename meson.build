@@ -26,5 +26,10 @@ endif
 
 neoinit_inc = include_directories('include')
 
+systemd_module_sources = []
+if get_option('systemd_compat')
+  systemd_module_sources = files('modules/systemd/service_sd.c')
+endif
+
 subdir('src')
 subdir('tests')

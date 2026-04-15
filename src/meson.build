@@ -5,12 +5,11 @@ neoinit_lib_sources = files(
   'mount.c',
   'reap.c',
   'service.c',
-  'service_sd.c',
   'service_yaml.c',
   'signal_handler.c',
   'control.c',
   'registry.c'
-)
+) + systemd_module_sources
 
 neoinit_lib = static_library('neoinit_lib',
   neoinit_lib_sources,
