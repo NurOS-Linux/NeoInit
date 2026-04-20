@@ -1,6 +1,9 @@
 option('systemd_compat', type : 'boolean', value : true,
   description : 'Build systemd unit file compatibility parser')
 
+option('runit_compat', type : 'boolean', value : false,
+  description : 'Build runit service directory compatibility parser')
+
 option('default_path', type : 'string', value : '',
   description : 'Default PATH for services if not set in environment (empty means use system default)')
 

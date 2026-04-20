@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 service_def_t *service_alloc(void) {
     service_def_t *def = calloc(1, sizeof(*def));
@@ -104,8 +105,17 @@ int service_load_dir(const char *dir, service_def_t ***out) {
         } else if (strcmp(ext, "service") == 0) {
             def = service_parse_sd(path);
 #endif
+#ifdef NEOINIT_RUNIT_COMPAT
+        } else {
+            struct stat st;
+            if (stat(path, &st) == 0 && S_ISDIR(st.st_mode))
+                def = service_parse_runit(path);
+            else
+                continue;
+#else
         } else {
             continue;
+#endif
         }
 
         if (!def) {

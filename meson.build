@@ -24,11 +24,20 @@ if get_option('systemd_compat')
   add_project_arguments('-DNEOINIT_SYSTEMD_COMPAT', language : 'c')
 endif
 
+if get_option('runit_compat')
+  add_project_arguments('-DNEOINIT_RUNIT_COMPAT', language : 'c')
+endif
+
 neoinit_inc = include_directories('include')
 
 systemd_module_sources = []
 if get_option('systemd_compat')
   systemd_module_sources = files('modules/systemd/service_sd.c')
+endif
+
+runit_module_sources = []
+if get_option('runit_compat')
+  runit_module_sources = files('modules/runit/service_runit.c')
 endif
 
 subdir('src')

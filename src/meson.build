@@ -9,7 +9,7 @@ neoinit_lib_sources = files(
   'signal_handler.c',
   'control.c',
   'registry.c'
-) + systemd_module_sources
+) + systemd_module_sources + runit_module_sources
 
 neoinit_lib = static_library('neoinit_lib',
   neoinit_lib_sources,

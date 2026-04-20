@@ -14,6 +14,12 @@ if get_option('systemd_compat')
   }
 endif
 
+if get_option('runit_compat')
+  tests += {
+    'test_service_runit' : { 'src': 'test_service_runit.c', 'cargs': ['-DNEOINIT_RUNIT_COMPAT'] },
+  }
+endif
+
 foreach name, cfg : tests
   exe = executable(name, cfg['src'],
     c_args              : cfg['cargs'],

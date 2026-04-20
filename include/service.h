@@ -38,3 +38,7 @@ service_def_t *service_parse_yaml(const char *path);
 #ifdef NEOINIT_SYSTEMD_COMPAT
 service_def_t *service_parse_sd(const char *path);
 #endif
+
+#ifdef NEOINIT_RUNIT_COMPAT
+service_def_t *service_parse_runit(const char *dir);
+#endif
