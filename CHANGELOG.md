@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.1.0] - 2026-04-20
 
 ### Added
 
@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Essential filesystem mounting (`proc`, `sysfs`, `devtmpfs`, `tmpfs` on `/run`)
 - YAML service definitions (`.yaml`, `.yml`)
 - systemd `.service` compatibility parser as optional build module (`-Dsystemd_compat=true`)
+- runit service directory compatibility parser as optional build module (`-Drunit_compat=true`)
 - Process launching with environment variables and working directory
 - `simple` and `oneshot` service types
 - Automatic service restart on failure with 100 ms throttle
@@ -23,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Service registry with lookup by name and PID
 - `servctl` utility with shell completions (bash, zsh, fish) and a man page
 - Container detection via `container` environment variable
-- Build options: `services_dir`, `default_path`, `container_detection`, `systemd_compat`
+- Build options: `services_dir`, `default_path`, `container_detection`, `systemd_compat`, `runit_compat`
 - Unit tests for all core modules
 - `ROADMAP.md` with planned milestones up to v1.0.0
 - `CHANGELOG.md` (this file)
