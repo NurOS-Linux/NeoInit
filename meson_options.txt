@@ -7,7 +7,7 @@ option('runit_compat', type : 'boolean', value : false,
 option('default_path', type : 'string', value : '',
   description : 'Default PATH for services if not set in environment (empty means use system default)')
 
-option('services_dir', type : 'string', value : '/etc/neoinit/services',
+option('services_dir', type : 'string', value : '/etc/raesir/services',
   description : 'Directory to scan for service definitions')
 
 option('container_detection', type : 'boolean', value : true,

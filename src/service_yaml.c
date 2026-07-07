@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: 2026 AnmiTaliDev <anmitalidev@nuros.org>
 // SPDX-License-Identifier: GPL-3.0-only
-// https://github.com/NurOS-Linux/neoinit
+// https://github.com/NurOS-Raesir/raesir
 
 /*
- * Minimal YAML parser for neoinit service definitions.
+ * Minimal YAML parser for raesir service definitions.
  *
  * Supported syntax:
  *

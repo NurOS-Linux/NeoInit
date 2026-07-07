@@ -32,7 +32,7 @@ meson test
 
 ## Install
 
-Installs `neoinit` to `/sbin/neoinit`.
+Installs `raesir` to `/sbin/raesir`.
 
 ```sh
 ninja install

@@ -1,11 +1,11 @@
 // SPDX-FileCopyrightText: 2026 AnmiTaliDev <anmitalidev@nuros.org>
 // SPDX-License-Identifier: GPL-3.0-only
-// https://github.com/NurOS-Linux/neoinit
+// https://github.com/NurOS-Raesir/raesir
 
 /*
  * Compatibility parser for runit service directories.
  *
- * A runit service directory under the neoinit services path must contain:
+ * A runit service directory under the raesir services path must contain:
  *   run    - executable script that launches the daemon (required)
  *
  * Optional files:

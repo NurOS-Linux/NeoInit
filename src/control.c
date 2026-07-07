@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2026 AnmiTaliDev <anmitalidev@nuros.org>
 // SPDX-License-Identifier: GPL-3.0-only
-// https://github.com/NurOS-Linux/neoinit
+// https://github.com/NurOS-Raesir/raesir
 
 #include "control.h"
 #include "log.h"
@@ -21,8 +21,8 @@ int control_init(void) {
     if (fd < 0) return -1;
 
     struct sockaddr_un addr = { .sun_family = AF_UNIX };
-    strncpy(addr.sun_path, NEOINIT_SOCK_PATH, sizeof(addr.sun_path) - 1);
-    unlink(NEOINIT_SOCK_PATH);
+    strncpy(addr.sun_path, RAESIR_SOCK_PATH, sizeof(addr.sun_path) - 1);
+    unlink(RAESIR_SOCK_PATH);
     if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
         close(fd);
         return -1;
@@ -32,7 +32,7 @@ int control_init(void) {
 }
 
 static void cmd_status(int fd) {
-    dprintf(fd, "neoinit: active\n");
+    dprintf(fd, "raesir: active\n");
 }
 
 static void cmd_list(int fd) {

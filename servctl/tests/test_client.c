@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2026 AnmiTaliDev <anmitalidev@nuros.org>
 // SPDX-License-Identifier: GPL-3.0-only
-// https://github.com/NurOS-Linux/neoinit
+// https://github.com/NurOS-Raesir/raesir
 
 #include "framework.h"
 #include "client.h"
@@ -33,7 +33,7 @@ static void *mock_server(void *arg) {
         if (n > 0) {
             buf[n] = '\0';
             if (strcmp(buf, "status") == 0)
-                write(cfd, "neoinit: active\n", 16);
+                write(cfd, "raesir: active\n", 16);
             else if (strcmp(buf, "list") == 0)
                 write(cfd, "NAME                 PID      STATUS\n", 37);
             else
@@ -58,7 +58,7 @@ int main(void) {
     char buf[1024];
 
     CHECK(servctl_run_command(TEST_SOCK, "status", buf, sizeof(buf)) == 0);
-    CHECK(strcmp(buf, "neoinit: active\n") == 0);
+    CHECK(strcmp(buf, "raesir: active\n") == 0);
 
     CHECK(servctl_run_command(TEST_SOCK, "list", buf, sizeof(buf)) == 0);
     CHECK(strcmp(buf, "NAME                 PID      STATUS\n") == 0);

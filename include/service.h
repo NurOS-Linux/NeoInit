@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2026 AnmiTaliDev <anmitalidev@nuros.org>
 // SPDX-License-Identifier: GPL-3.0-only
-// https://github.com/NurOS-Linux/neoinit
+// https://github.com/NurOS-Raesir/raesir
 
 #pragma once
 
@@ -40,10 +40,10 @@ char **service_parse_argv(const char *cmd);
 /* Format-specific parsers */
 service_def_t *service_parse_yaml(const char *path);
 
-#ifdef NEOINIT_SYSTEMD_COMPAT
+#ifdef RAESIR_SYSTEMD_COMPAT
 service_def_t *service_parse_sd(const char *path);
 #endif
 
-#ifdef NEOINIT_RUNIT_COMPAT
+#ifdef RAESIR_RUNIT_COMPAT
 service_def_t *service_parse_runit(const char *dir);
 #endif

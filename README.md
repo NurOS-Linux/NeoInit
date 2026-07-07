@@ -1,4 +1,4 @@
-# neoinit
+# raesir
 
 ![License](https://img.shields.io/badge/license-GPL--3.0-blue)
 ![Language](https://img.shields.io/badge/language-C11-informational)
@@ -33,14 +33,14 @@ Install:
 ninja install
 ```
 
-Installs `neoinit` to `/sbin/neoinit` and `servctl` to `/usr/bin/servctl`.
+Installs `raesir` to `/sbin/raesir` and `servctl` to `/usr/bin/servctl`.
 
 ## Build options
 
 | Option               | Default                    | Description                                    |
 |----------------------|----------------------------|------------------------------------------------|
 | `systemd_compat`     | `true`                     | Build systemd `.service` file parser           |
-| `services_dir`       | `/etc/neoinit/services`    | Directory to scan for service definitions      |
+| `services_dir`       | `/etc/raesir/services`    | Directory to scan for service definitions      |
 | `default_path`       | *(system default)*         | Default `PATH` for services                    |
 | `container_detection`| `true`                     | Skip reboot and unmount in container environments |
 
@@ -52,7 +52,7 @@ meson setup builddir -Dsystemd_compat=false
 
 ## Service definitions
 
-Services are loaded from `/etc/neoinit/services/` at boot in alphabetical order.
+Services are loaded from `/etc/raesir/services/` at boot in alphabetical order.
 
 YAML format:
 
@@ -71,7 +71,7 @@ See [docs/services.md](docs/services.md) for full field reference.
 
 ## Runtime control
 
-`servctl` communicates with the running init via `/run/neoinit.sock`:
+`servctl` communicates with the running init via `/run/raesir.sock`:
 
 ```sh
 servctl status          # show init status

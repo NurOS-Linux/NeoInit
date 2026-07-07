@@ -1,4 +1,4 @@
-tests_inc = [include_directories('.'), neoinit_inc]
+tests_inc = [include_directories('.'), raesir_inc]
 
 tests = {
   'test_log'          : { 'src': 'test_log.c',          'cargs': [] },
@@ -10,20 +10,20 @@ tests = {
 
 if get_option('systemd_compat')
   tests += {
-    'test_service_sd' : { 'src': 'test_service_sd.c', 'cargs': ['-DNEOINIT_SYSTEMD_COMPAT'] },
+    'test_service_sd' : { 'src': 'test_service_sd.c', 'cargs': ['-DRAESIR_SYSTEMD_COMPAT'] },
   }
 endif
 
 if get_option('runit_compat')
   tests += {
-    'test_service_runit' : { 'src': 'test_service_runit.c', 'cargs': ['-DNEOINIT_RUNIT_COMPAT'] },
+    'test_service_runit' : { 'src': 'test_service_runit.c', 'cargs': ['-DRAESIR_RUNIT_COMPAT'] },
   }
 endif
 
 foreach name, cfg : tests
   exe = executable(name, cfg['src'],
     c_args              : cfg['cargs'],
-    link_with           : neoinit_lib,
+    link_with           : raesir_lib,
     include_directories : tests_inc,
   )
   test(name, exe)
