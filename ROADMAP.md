@@ -18,7 +18,7 @@
 
 ## v0.2.0 — service ordering and parallel startup
 
-- [ ] Service dependency declarations (`after`, `requires` in YAML; `After=`, `Requires=`, `Wants=` in `.service`)
+- [x] Service dependency declarations (`after`, `requires` in YAML; `After=`, `Requires=`, `Wants=` in `.service`)
 - [ ] Topological sort at startup
 - [ ] Parallel startup of independent services
 - [ ] `wants` weak dependency (failure does not block dependents)

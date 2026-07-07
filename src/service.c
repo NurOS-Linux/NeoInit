@@ -31,7 +31,22 @@ void service_free(service_def_t *def) {
     free(def->working_dir);
     free_strv(def->argv);
     free_strv(def->env);
+    free_strv(def->after);
+    free_strv(def->requires);
+    free_strv(def->wants);
     free(def);
+}
+
+char **service_strv_append(char **v, const char *val) {
+    int n = 0;
+    if (v) {
+        while (v[n]) n++;
+    }
+    char **tmp = realloc(v, sizeof(char *) * (size_t)(n + 2));
+    if (!tmp) return v;
+    tmp[n]     = strdup(val);
+    tmp[n + 1] = NULL;
+    return tmp;
 }
 
 char **service_parse_argv(const char *cmd) {

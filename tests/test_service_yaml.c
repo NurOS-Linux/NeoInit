@@ -19,7 +19,12 @@ static const char *yaml_full =
     "type: oneshot\n"
     "env:\n"
     "  - FOO=bar\n"
-    "  - BAZ=qux\n";
+    "  - BAZ=qux\n"
+    "after:\n"
+    "  - network\n"
+    "requires:\n"
+    "  - database\n"
+    "  - cache\n";
 
 static const char *yaml_minimal =
     "exec: /usr/bin/true\n";
@@ -59,9 +64,15 @@ int main(void) {
     CHECK(strcmp(def->env[0], "FOO=bar") == 0);
     CHECK(strcmp(def->env[1], "BAZ=qux") == 0);
     CHECK(def->env[2] == NULL);
+    CHECK(def->after != NULL && strcmp(def->after[0], "network") == 0);
+    CHECK(def->after[1] == NULL);
+    CHECK(def->requires != NULL && strcmp(def->requires[0], "database") == 0);
+    CHECK(def->requires[1] != NULL && strcmp(def->requires[1], "cache") == 0);
+    CHECK(def->requires[2] == NULL);
+    CHECK(def->wants == NULL);
     service_free(def);
 
-    /* minimal: name derived from filename */
+    /* minimal: name derived from filename, no dependency declarations */
     path = write_tmp(yaml_minimal);
     CHECK(path != NULL);
     def = service_parse_yaml(path);
@@ -70,6 +81,8 @@ int main(void) {
     CHECK(def->name != NULL);
     CHECK(def->restart == 0);
     CHECK(def->type == SERVICE_TYPE_SIMPLE);
+    CHECK(def->after == NULL);
+    CHECK(def->requires == NULL);
     service_free(def);
 
     /* missing exec → NULL */
