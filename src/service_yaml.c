@@ -16,6 +16,10 @@
  *   env:
  *     - FOO=bar
  *     - BAZ=qux
+ *   after:
+ *     - network
+ *   requires:
+ *     - database
  */
 
 #include "service.h"
@@ -33,18 +37,6 @@ static char *trim(char *s) {
     char *end = s + strlen(s);
     while (end > s && isspace((unsigned char)*(end - 1))) *--end = '\0';
     return s;
-}
-
-static void append_env(service_def_t *def, const char *val) {
-    int n = 0;
-    if (def->env) {
-        while (def->env[n]) n++;
-    }
-    char **tmp = realloc(def->env, sizeof(char *) * (size_t)(n + 2));
-    if (!tmp) return;
-    def->env       = tmp;
-    def->env[n]    = strdup(val);
-    def->env[n + 1] = NULL;
 }
 
 service_def_t *service_parse_yaml(const char *path) {
@@ -71,7 +63,11 @@ service_def_t *service_parse_yaml(const char *path) {
         if (indent > 0 && raw[indent] == '-' && raw[indent + 1] == ' ') {
             const char *val = trim((char *)(raw + indent + 2));
             if (list_key[0] && strcmp(list_key, "env") == 0)
-                append_env(def, val);
+                def->env = service_strv_append(def->env, val);
+            else if (list_key[0] && strcmp(list_key, "after") == 0)
+                def->after = service_strv_append(def->after, val);
+            else if (list_key[0] && strcmp(list_key, "requires") == 0)
+                def->requires = service_strv_append(def->requires, val);
             continue;
         }
 

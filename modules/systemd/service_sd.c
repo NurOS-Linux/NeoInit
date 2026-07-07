@@ -8,6 +8,9 @@
  *
  *   [Unit]
  *   Description=
+ *   After=       (space-separated service names, ordering only)
+ *   Requires=    (space-separated service names, hard dependency)
+ *   Wants=       (space-separated service names, weak dependency)
  *
  *   [Service]
  *   ExecStart=
@@ -38,15 +41,15 @@ static char *trim(char *s) {
     return s;
 }
 
-static void append_env(service_def_t *def, const char *val) {
-    int n = 0;
-    if (def->env)
-        while (def->env[n]) n++;
-    char **tmp = realloc(def->env, sizeof(char *) * (size_t)(n + 2));
-    if (!tmp) return;
-    def->env        = tmp;
-    def->env[n]     = strdup(val);
-    def->env[n + 1] = NULL;
+static char **append_tokens(char **arr, const char *val) {
+    char buf[LINE_MAX_LEN];
+    strncpy(buf, val, sizeof(buf) - 1);
+    buf[sizeof(buf) - 1] = '\0';
+
+    for (char *tok = strtok(buf, " \t"); tok; tok = strtok(NULL, " \t"))
+        arr = service_strv_append(arr, tok);
+
+    return arr;
 }
 
 service_def_t *service_parse_sd(const char *path) {
@@ -90,6 +93,12 @@ service_def_t *service_parse_sd(const char *path) {
             if (strcmp(key, "Description") == 0) {
                 free(def->description);
                 def->description = strdup(val);
+            } else if (strcmp(key, "After") == 0) {
+                def->after = append_tokens(def->after, val);
+            } else if (strcmp(key, "Requires") == 0) {
+                def->requires = append_tokens(def->requires, val);
+            } else if (strcmp(key, "Wants") == 0) {
+                def->wants = append_tokens(def->wants, val);
             }
             break;
 
@@ -104,7 +113,7 @@ service_def_t *service_parse_sd(const char *path) {
                 free(def->working_dir);
                 def->working_dir = strdup(val);
             } else if (strcmp(key, "Environment") == 0) {
-                append_env(def, val);
+                def->env = service_strv_append(def->env, val);
             } else if (strcmp(key, "Restart") == 0) {
                 def->restart = (strcmp(val, "no") != 0);
             } else if (strcmp(key, "Type") == 0) {

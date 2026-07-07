@@ -17,10 +17,15 @@ typedef struct {
     char          *working_dir;
     service_type_t type;
     int            restart;     /* 1 = restart on failure                     */
+    char         **after;       /* NULL-terminated service names, ordering only        */
+    char         **requires;    /* NULL-terminated service names, hard dependency      */
+    char         **wants;       /* NULL-terminated service names, weak dependency      */
 } service_def_t;
 
 service_def_t *service_alloc(void);
 void           service_free(service_def_t *def);
+
+char **service_strv_append(char **v, const char *val);
 
 /*
  * Scan dir for *.yaml / *.service files, parse them, return an allocated

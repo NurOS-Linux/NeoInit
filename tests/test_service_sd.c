@@ -13,6 +13,10 @@
 static const char *sd_full =
     "[Unit]\n"
     "Description=Test systemd service\n"
+    "After=network database\n"
+    "Requires=database\n"
+    "Wants=cache\n"
+    "Wants=metrics\n"
     "\n"
     "[Service]\n"
     "ExecStart=/usr/bin/echo hello world\n"
@@ -58,6 +62,14 @@ int main(void) {
     CHECK(def->env[2] == NULL);
     CHECK(def->restart == 1);
     CHECK(def->type == SERVICE_TYPE_ONESHOT);
+    CHECK(def->after != NULL && strcmp(def->after[0], "network") == 0);
+    CHECK(def->after[1] != NULL && strcmp(def->after[1], "database") == 0);
+    CHECK(def->after[2] == NULL);
+    CHECK(def->requires != NULL && strcmp(def->requires[0], "database") == 0);
+    CHECK(def->requires[1] == NULL);
+    CHECK(def->wants != NULL && strcmp(def->wants[0], "cache") == 0);
+    CHECK(def->wants[1] != NULL && strcmp(def->wants[1], "metrics") == 0);
+    CHECK(def->wants[2] == NULL);
     service_free(def);
 
     /* missing ExecStart → NULL */
