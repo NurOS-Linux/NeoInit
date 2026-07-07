@@ -1,17 +1,17 @@
 .TH SERVCTL 1 "26 March 2026" "v0.1.0-alpha2" "servctl"
 .SH NAME
-servctl \- Control the neoinit init system
+servctl \- Control the raesir init system
 .SH SYNOPSIS
 .B servctl
 [\fICOMMAND\fR] [\fISERVICE\fR...]
 .SH DESCRIPTION
 .B servctl
-is the command-line interface for managing services in the \fBneoinit\fR system.
-It communicates with PID 1 via \fB/run/neoinit.sock\fR.
+is the command-line interface for managing services in the \fBraesir\fR system.
+It communicates with PID 1 via \fB/run/raesir.sock\fR.
 .SH COMMANDS
 .TP
 .B status
-Displays the general status of the neoinit process.
+Displays the general status of the raesir process.
 .TP
 .B list
 Lists all currently loaded and running services.
@@ -26,9 +26,9 @@ Stops the specified service.
 Restarts the specified service.
 .SH FILES
 .TP
-\fB/run/neoinit.sock\fR
-The Unix domain socket used for communication with \fBneoinit\fR.
+\fB/run/raesir.sock\fR
+The Unix domain socket used for communication with \fBraesir\fR.
 .SH AUTHOR
 AnmiTaliDev <anmitalidev@nuros.org>
 .SH "SEE ALSO"
-.BR neoinit (1)
+.BR raesir (1)

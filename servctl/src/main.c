@@ -1,18 +1,18 @@
 // SPDX-FileCopyrightText: 2026 AnmiTaliDev <anmitalidev@nuros.org>
 // SPDX-License-Identifier: GPL-3.0-only
-// https://github.com/NurOS-Linux/neoinit
+// https://github.com/NurOS-Raesir/raesir
 
 #include "client.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define NEOINIT_SOCK_PATH "/run/neoinit.sock"
+#define RAESIR_SOCK_PATH "/run/raesir.sock"
 
 static void usage(const char *progname) {
     fprintf(stderr, "Usage: %s <command> [service]\n\n", progname);
     fprintf(stderr, "Commands:\n");
-    fprintf(stderr, "  status         Check if neoinit is alive\n");
+    fprintf(stderr, "  status         Check if raesir is alive\n");
     fprintf(stderr, "  list           List all services and their state\n");
     fprintf(stderr, "  start <name>   Launch a service\n");
     fprintf(stderr, "  stop <name>    Stop a running service\n");
@@ -32,8 +32,8 @@ int main(int argc, char *argv[]) {
         snprintf(cmd_line, sizeof(cmd_line), "%s", argv[1]);
 
     char buf[4096];
-    if (servctl_run_command(NEOINIT_SOCK_PATH, cmd_line, buf, sizeof(buf)) < 0) {
-        fprintf(stderr, "Error: Could not communicate with neoinit at %s\n", NEOINIT_SOCK_PATH);
+    if (servctl_run_command(RAESIR_SOCK_PATH, cmd_line, buf, sizeof(buf)) < 0) {
+        fprintf(stderr, "Error: Could not communicate with raesir at %s\n", RAESIR_SOCK_PATH);
         return 1;
     }
 

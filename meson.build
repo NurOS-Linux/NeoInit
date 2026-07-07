@@ -1,4 +1,4 @@
-project('neoinit', 'c',
+project('raesir', 'c',
   version : '0.1.0-alpha2',
   default_options : [
     'c_std=c11',
@@ -21,14 +21,14 @@ if get_option('container_detection')
 endif
 
 if get_option('systemd_compat')
-  add_project_arguments('-DNEOINIT_SYSTEMD_COMPAT', language : 'c')
+  add_project_arguments('-DRAESIR_SYSTEMD_COMPAT', language : 'c')
 endif
 
 if get_option('runit_compat')
-  add_project_arguments('-DNEOINIT_RUNIT_COMPAT', language : 'c')
+  add_project_arguments('-DRAESIR_RUNIT_COMPAT', language : 'c')
 endif
 
-neoinit_inc = include_directories('include')
+raesir_inc = include_directories('include')
 
 systemd_module_sources = []
 if get_option('systemd_compat')

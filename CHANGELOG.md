@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automatic service restart on failure with 100 ms throttle
 - Zombie reaping via `SIGCHLD`
 - Signal handling: `SIGTERM` → poweroff, `SIGINT` → reboot
-- Unix domain socket control interface at `/run/neoinit.sock`
+- Unix domain socket control interface at `/run/raesir.sock`
 - Commands over control socket: `status`, `list`, `start`, `stop`
 - Service registry with lookup by name and PID
 - `servctl` utility with shell completions (bash, zsh, fish) and a man page

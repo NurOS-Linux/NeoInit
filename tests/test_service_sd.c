@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2026 AnmiTaliDev <anmitalidev@nuros.org>
 // SPDX-License-Identifier: GPL-3.0-only
-// https://github.com/NurOS-Linux/neoinit
+// https://github.com/NurOS-Raesir/raesir
 
 #include "framework.h"
 #include "service.h"
@@ -36,7 +36,7 @@ static const char *sd_no_exec =
     "Type=simple\n";
 
 static char *write_tmp(const char *content) {
-    char path[] = "/tmp/neoinit_test_XXXXXX.service";
+    char path[] = "/tmp/raesir_test_XXXXXX.service";
     int fd = mkstemps(path, 8);
     if (fd < 0) return NULL;
     write(fd, content, strlen(content));

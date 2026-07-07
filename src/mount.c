@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2026 AnmiTaliDev <anmitalidev@nuros.org>
 // SPDX-License-Identifier: GPL-3.0-only
-// https://github.com/NurOS-Linux/neoinit
+// https://github.com/NurOS-Raesir/raesir
 
 #include "mount.h"
 #include "log.h"

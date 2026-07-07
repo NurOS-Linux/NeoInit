@@ -1,5 +1,5 @@
 # Core logic for testing
-neoinit_lib_sources = files(
+raesir_lib_sources = files(
   'launcher.c',
   'log.c',
   'mount.c',
@@ -11,16 +11,16 @@ neoinit_lib_sources = files(
   'registry.c'
 ) + systemd_module_sources + runit_module_sources
 
-neoinit_lib = static_library('neoinit_lib',
-  neoinit_lib_sources,
-  include_directories : neoinit_inc,
+raesir_lib = static_library('raesir_lib',
+  raesir_lib_sources,
+  include_directories : raesir_inc,
   install : false
 )
 
 # Main executable
-executable('neoinit',
+executable('raesir',
   'main.c',
-  link_with           : neoinit_lib,
-  include_directories : neoinit_inc,
+  link_with           : raesir_lib,
+  include_directories : raesir_inc,
   install             : true
 )

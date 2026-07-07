@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2026 AnmiTaliDev <anmitalidev@nuros.org>
 // SPDX-License-Identifier: GPL-3.0-only
-// https://github.com/NurOS-Linux/neoinit
+// https://github.com/NurOS-Raesir/raesir
 
 #include "framework.h"
 #include "service.h"
@@ -34,7 +34,7 @@ static const char *yaml_no_exec =
     "description: No exec\n";
 
 static char *write_tmp(const char *content) {
-    char path[] = "/tmp/neoinit_test_XXXXXX.yaml";
+    char path[] = "/tmp/raesir_test_XXXXXX.yaml";
     int fd = mkstemps(path, 5);
     if (fd < 0) return NULL;
     write(fd, content, strlen(content));

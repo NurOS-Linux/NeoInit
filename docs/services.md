@@ -1,6 +1,6 @@
 # Service definitions
 
-neoinit reads service definitions from `/etc/neoinit/services/` at boot.
+raesir reads service definitions from `/etc/raesir/services/` at boot.
 Files are processed in alphabetical order.
 
 ## YAML format (`.yaml`, `.yml`)
@@ -38,10 +38,10 @@ requires:
 `after` and `requires` name other services by their `name` field (or filename
 without extension, if `name` is not set). `after` is ordering only. `requires`
 is a hard dependency. Both are parsed and stored on the service definition;
-neoinit does not yet act on them — startup order still follows alphabetical
+raesir does not yet act on them — startup order still follows alphabetical
 file order until topological sort lands (see [ROADMAP.md](../ROADMAP.md)).
 
-`oneshot` — neoinit waits for the process to exit before launching the next service.
+`oneshot` — raesir waits for the process to exit before launching the next service.
 `simple` — process is launched and left running.
 
 ## systemd compatibility (`.service`)

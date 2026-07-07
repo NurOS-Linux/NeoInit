@@ -11,7 +11,7 @@
 - [x] Automatic restart on failure
 - [x] Zombie reaping via `SIGCHLD`
 - [x] Signal handling: `SIGTERM` → poweroff, `SIGINT` → reboot
-- [x] Unix socket control interface (`/run/neoinit.sock`)
+- [x] Unix socket control interface (`/run/raesir.sock`)
 - [x] `servctl` utility: `status`, `list`, `start`, `stop`
 - [x] Container detection (`container` env variable)
 - [x] Modular build: `modules/systemd` as optional source module
@@ -33,7 +33,7 @@
 
 ## v0.4.0 — logging
 
-- [ ] File-based logging (`/var/log/neoinit.log`) with rotation support
+- [ ] File-based logging (`/var/log/raesir.log`) with rotation support
 - [ ] Per-service stdout/stderr capture to log files
 - [ ] Log levels configurable at build and runtime
 - [ ] Optional structured log output (key=value pairs)
@@ -55,6 +55,6 @@
 
 - [ ] All v0.x.0 features stable and documented
 - [ ] Comprehensive integration test suite (real PID 1 in a VM or namespace)
-- [ ] Man pages for `neoinit(8)` and `servctl(1)`
+- [ ] Man pages for `raesir(8)` and `servctl(1)`
 - [ ] Stable control socket protocol with versioning
 - [ ] Security hardening: socket permissions, capability dropping

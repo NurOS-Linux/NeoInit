@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2026 AnmiTaliDev <anmitalidev@nuros.org>
 // SPDX-License-Identifier: GPL-3.0-only
-// https://github.com/NurOS-Linux/neoinit
+// https://github.com/NurOS-Raesir/raesir
 
 #include "log.h"
 
@@ -39,11 +39,11 @@ void log_msg(log_level_t level, const char *fmt, ...) {
 
     if (kmsg_fd >= 0) {
         char kmsg[544];
-        int kn = snprintf(kmsg, sizeof(kmsg), "<%d>neoinit: %s\n",
+        int kn = snprintf(kmsg, sizeof(kmsg), "<%d>raesir: %s\n",
                           kmsg_prio[level], buf);
         if (kn > 0)
             write(kmsg_fd, kmsg, (size_t)kn);
     }
     
-    fprintf(stderr, "neoinit [%s]: %s\n", level_tag[level], buf);
+    fprintf(stderr, "raesir [%s]: %s\n", level_tag[level], buf);
 }

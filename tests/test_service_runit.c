@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2026 AnmiTaliDev <anmitalidev@nuros.org>
 // SPDX-License-Identifier: GPL-3.0-only
-// https://github.com/NurOS-Linux/neoinit
+// https://github.com/NurOS-Raesir/raesir
 
 #include "framework.h"
 #include "service.h"
@@ -14,7 +14,7 @@
 #include <unistd.h>
 
 static char *make_tmpdir(void) {
-    char tmpl[] = "/tmp/neoinit_runit_XXXXXX";
+    char tmpl[] = "/tmp/raesir_runit_XXXXXX";
     return strdup(mkdtemp(tmpl));
 }
 

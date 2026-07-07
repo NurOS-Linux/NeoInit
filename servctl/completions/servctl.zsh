@@ -3,7 +3,7 @@
 _servctl() {
     local -a commands
     commands=(
-        'status:Check if neoinit is alive'
+        'status:Check if raesir is alive'
         'list:List all services and their state'
         'start:Launch a service'
         'stop:Stop a running service'

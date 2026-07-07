@@ -1,10 +1,10 @@
 // SPDX-FileCopyrightText: 2026 AnmiTaliDev <anmitalidev@nuros.org>
 // SPDX-License-Identifier: GPL-3.0-only
-// https://github.com/NurOS-Linux/neoinit
+// https://github.com/NurOS-Raesir/raesir
 
 /*
  * Compatibility parser for systemd .service unit files.
- * Only the subset relevant to neoinit is recognised:
+ * Only the subset relevant to raesir is recognised:
  *
  *   [Unit]
  *   Description=
