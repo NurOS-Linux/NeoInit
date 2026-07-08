@@ -28,17 +28,18 @@ void           service_free(service_def_t *def);
 char **service_strv_append(char **v, const char *val);
 
 /*
- * Scan dir for *.yaml / *.service files, parse them, return an allocated
- * array of pointers (caller frees each element and the array itself).
+ * Scan dir for *.toml / *.service files (and *.yaml / *.yml when built with
+ * YAML compatibility), parse them, return an allocated array of pointers
+ * (caller frees each element and the array itself).
  * Returns number of loaded definitions, -1 on hard error.
  */
 int service_load_dir(const char *dir, service_def_t ***out);
 
-/* Shared argv builder used by both parsers */
+/* Shared argv builder used by all parsers */
 char **service_parse_argv(const char *cmd);
 
-/* Format-specific parsers */
-service_def_t *service_parse_yaml(const char *path);
+/* Native format parser */
+service_def_t *service_parse_toml(const char *path);
 
 #ifdef RAESIR_SYSTEMD_COMPAT
 service_def_t *service_parse_sd(const char *path);
@@ -46,4 +47,8 @@ service_def_t *service_parse_sd(const char *path);
 
 #ifdef RAESIR_RUNIT_COMPAT
 service_def_t *service_parse_runit(const char *dir);
+#endif
+
+#ifdef RAESIR_YAML_COMPAT
+service_def_t *service_parse_yaml(const char *path);
 #endif

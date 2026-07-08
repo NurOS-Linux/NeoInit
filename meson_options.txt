@@ -4,6 +4,9 @@ option('systemd_compat', type : 'boolean', value : true,
 option('runit_compat', type : 'boolean', value : false,
   description : 'Build runit service directory compatibility parser')
 
+option('yaml_compat', type : 'boolean', value : true,
+  description : 'Build legacy YAML unit file compatibility parser (TOML is the native format)')
+
 option('default_path', type : 'string', value : '',
   description : 'Default PATH for services if not set in environment (empty means use system default)')
 
