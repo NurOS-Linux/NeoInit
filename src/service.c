@@ -114,8 +114,12 @@ int service_load_dir(const char *dir, service_def_t ***out) {
         const char    *ext = file_ext(ent->d_name);
         service_def_t *def = NULL;
 
-        if (strcmp(ext, "yaml") == 0 || strcmp(ext, "yml") == 0) {
+        if (strcmp(ext, "toml") == 0) {
+            def = service_parse_toml(path);
+#ifdef RAESIR_YAML_COMPAT
+        } else if (strcmp(ext, "yaml") == 0 || strcmp(ext, "yml") == 0) {
             def = service_parse_yaml(path);
+#endif
 #ifdef RAESIR_SYSTEMD_COMPAT
         } else if (strcmp(ext, "service") == 0) {
             def = service_parse_sd(path);

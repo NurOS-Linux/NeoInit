@@ -5,11 +5,11 @@ raesir_lib_sources = files(
   'mount.c',
   'reap.c',
   'service.c',
-  'service_yaml.c',
+  'service_toml.c',
   'signal_handler.c',
   'control.c',
   'registry.c'
-) + systemd_module_sources + runit_module_sources
+) + systemd_module_sources + runit_module_sources + yaml_module_sources
 
 raesir_lib = static_library('raesir_lib',
   raesir_lib_sources,

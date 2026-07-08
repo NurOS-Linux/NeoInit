@@ -56,7 +56,6 @@ service_def_t *service_parse_yaml(const char *path) {
 
         const char *raw = line;
 
-        /* list item: leading whitespace + "- " */
         int indent = 0;
         while (raw[indent] == ' ' || raw[indent] == '\t') indent++;
 
@@ -71,11 +70,9 @@ service_def_t *service_parse_yaml(const char *path) {
             continue;
         }
 
-        /* skip comment and blank lines */
         char *trimmed = trim((char *)raw);
         if (*trimmed == '#' || *trimmed == '\0') continue;
 
-        /* key: [value] */
         char *colon = strchr(trimmed, ':');
         if (!colon) continue;
 
@@ -83,7 +80,6 @@ service_def_t *service_parse_yaml(const char *path) {
         char *key    = trim(trimmed);
         char *val    = trim(colon + 1);
 
-        /* entering a list block (value is empty) */
         if (*val == '\0') {
             strncpy(list_key, key, sizeof(list_key) - 1);
             list_key[sizeof(list_key) - 1] = '\0';
@@ -125,7 +121,6 @@ service_def_t *service_parse_yaml(const char *path) {
     }
 
     if (!def->name) {
-        /* derive name from filename without extension */
         const char *base = strrchr(path, '/');
         base = base ? base + 1 : path;
         char tmp[256];

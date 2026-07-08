@@ -28,6 +28,10 @@ if get_option('runit_compat')
   add_project_arguments('-DRAESIR_RUNIT_COMPAT', language : 'c')
 endif
 
+if get_option('yaml_compat')
+  add_project_arguments('-DRAESIR_YAML_COMPAT', language : 'c')
+endif
+
 raesir_inc = include_directories('include')
 
 systemd_module_sources = []
@@ -38,6 +42,11 @@ endif
 runit_module_sources = []
 if get_option('runit_compat')
   runit_module_sources = files('modules/runit/service_runit.c')
+endif
+
+yaml_module_sources = []
+if get_option('yaml_compat')
+  yaml_module_sources = files('modules/yaml/service_yaml.c')
 endif
 
 subdir('src')
