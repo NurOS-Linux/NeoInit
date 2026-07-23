@@ -17,6 +17,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/time.h>
 #include <sys/un.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -220,6 +221,10 @@ static void cmd_rescan(int fd) {
 void control_handle_data(int listen_fd) {
     int fd = accept4(listen_fd, NULL, NULL, SOCK_CLOEXEC);
     if (fd < 0) return;
+
+    struct timeval tv = { .tv_sec = 2, .tv_usec = 0 };
+    setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+    setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv));
 
     struct ucred cred;
     socklen_t cred_len = sizeof(cred);
