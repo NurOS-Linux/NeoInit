@@ -3,6 +3,7 @@
 // https://github.com/NurOS-Raesir/raesir
 
 #include "control.h"
+#include "cgroup.h"
 #include "log.h"
 #include "launcher.h"
 #include "reap.h"
@@ -111,6 +112,7 @@ static int stop_and_wait(service_entry_t *ent) {
     }
 
     reap_untrack(pid);
+    cgroup_teardown(ent->def->name);
     ent->running = 0;
     ent->pid = -1;
     return 0;

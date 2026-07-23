@@ -3,6 +3,7 @@
 // https://github.com/NurOS-Raesir/raesir
 
 #include "launcher.h"
+#include "cgroup.h"
 #include "log.h"
 #include "reap.h"
 
@@ -70,6 +71,7 @@ pid_t service_launch(const service_def_t *def) {
         _exit(127);
     }
 
+    cgroup_setup(def, pid);
     log_info("launched %s [%d]", def->name, (int)pid);
     reap_track(pid, def->name);
     return pid;

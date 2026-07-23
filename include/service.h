@@ -19,6 +19,8 @@ typedef struct {
     int            restart;     /* 1 = restart on failure                     */
     int            restart_delay_ms;
     int            restart_max;
+    char          *memory_max;
+    int            cpu_weight;
     char         **after;       /* NULL-terminated service names, ordering only        */
     char         **requires;    /* NULL-terminated service names, hard dependency      */
     char         **wants;       /* NULL-terminated service names, weak dependency      */

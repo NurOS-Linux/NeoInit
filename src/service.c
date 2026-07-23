@@ -33,6 +33,7 @@ void service_free(service_def_t *def) {
     free(def->name);
     free(def->description);
     free(def->working_dir);
+    free(def->memory_max);
     free_strv(def->argv);
     free_strv(def->env);
     free_strv(def->after);

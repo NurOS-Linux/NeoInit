@@ -179,6 +179,14 @@ service_def_t *service_parse_toml(const char *path) {
                 def->working_dir = str_val;
                 str_val           = NULL;
             }
+        } else if (strcmp(key, "memory_max") == 0) {
+            if (str_val) {
+                free(def->memory_max);
+                def->memory_max = str_val;
+                str_val         = NULL;
+            }
+        } else if (strcmp(key, "cpu_weight") == 0) {
+            def->cpu_weight = atoi(val);
         } else if (strcmp(key, "restart") == 0) {
             def->restart = (strcmp(val, "true") == 0);
         } else if (strcmp(key, "restart_delay_ms") == 0) {

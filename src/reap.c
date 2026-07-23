@@ -3,6 +3,7 @@
 // https://github.com/NurOS-Raesir/raesir
 
 #include "reap.h"
+#include "cgroup.h"
 #include "log.h"
 #include "registry.h"
 
@@ -68,6 +69,9 @@ int reap_zombies(void) {
         
         registry_update_pid(pid, 0);
         
+        if (strcmp(name, "(unknown)") != 0)
+            cgroup_teardown(name);
+
         reap_untrack(pid);
         reaped++;
     }

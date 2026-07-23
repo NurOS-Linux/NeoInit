@@ -102,6 +102,11 @@ service_def_t *service_parse_yaml(const char *path) {
         } else if (strcmp(key, "working_dir") == 0) {
             free(def->working_dir);
             def->working_dir = strdup(val);
+        } else if (strcmp(key, "memory_max") == 0) {
+            free(def->memory_max);
+            def->memory_max = strdup(val);
+        } else if (strcmp(key, "cpu_weight") == 0) {
+            def->cpu_weight = atoi(val);
         } else if (strcmp(key, "restart") == 0) {
             def->restart = (strcmp(val, "true") == 0 || strcmp(val, "yes") == 0 || strcmp(val, "1") == 0);
         } else if (strcmp(key, "restart_delay_ms") == 0) {

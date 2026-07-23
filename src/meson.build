@@ -1,5 +1,6 @@
 # Core logic for testing
 raesir_lib_sources = files(
+  'cgroup.c',
   'launcher.c',
   'log.c',
   'mount.c',
