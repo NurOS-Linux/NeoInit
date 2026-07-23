@@ -62,6 +62,7 @@ static void cmd_stop(int fd, const char *name) {
     if (kill(ent->pid, SIGTERM) < 0) {
         dprintf(fd, "err: kill: %s\n", strerror(errno));
     } else {
+        ent->stop_requested = 1;
         dprintf(fd, "ok: stopping %s\n", name);
     }
 }
@@ -85,6 +86,7 @@ static void cmd_start(int fd, const char *name) {
         ent->pid = pid;
         ent->running = 1;
         ent->restart_count = 0;
+        ent->stop_requested = 0;
         dprintf(fd, "ok: started %s [pid %d]\n", name, pid);
     } else {
         dprintf(fd, "err: failed to launch %s\n", name);
@@ -94,6 +96,7 @@ static void cmd_start(int fd, const char *name) {
 static int stop_and_wait(service_entry_t *ent) {
     pid_t pid = ent->pid;
 
+    ent->stop_requested = 1;
     if (kill(pid, SIGTERM) < 0)
         return -1;
 
@@ -139,6 +142,7 @@ static void cmd_restart(int fd, const char *name) {
         ent->pid = pid;
         ent->running = 1;
         ent->restart_count = 0;
+        ent->stop_requested = 0;
         dprintf(fd, "ok: restarted %s [pid %d]\n", name, pid);
     } else {
         dprintf(fd, "err: failed to launch %s\n", name);

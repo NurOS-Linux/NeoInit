@@ -48,6 +48,7 @@ static void do_halt(int cmd) {
 
 static void on_service_restart(service_entry_t *ent) {
     if (!ent->enabled) return;
+    if (ent->stop_requested) return;
 
     if (ent->def->restart_max > 0 &&
         ent->restart_count >= ent->def->restart_max) {

@@ -14,6 +14,7 @@ typedef struct {
     int            exit_ok;
     int            enabled;
     int            restart_count;
+    int            stop_requested;
 } service_entry_t;
 
 void             registry_init(void);

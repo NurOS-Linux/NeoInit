@@ -24,6 +24,7 @@ int registry_add(service_def_t *def) {
     registry[registry_size].exit_ok = 0;
     registry[registry_size].enabled = 1;
     registry[registry_size].restart_count = 0;
+    registry[registry_size].stop_requested = 0;
     registry_size++;
     return 0;
 }
