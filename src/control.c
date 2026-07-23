@@ -180,6 +180,16 @@ static void cmd_disable(int fd, const char *name) {
     dprintf(fd, "ok: disabled %s\n", name);
 }
 
+static void cmd_loglevel(int fd, const char *arg) {
+    int lv = log_level_from_str(arg);
+    if (lv < 0) {
+        dprintf(fd, "err: unknown log level '%s'\n", arg);
+        return;
+    }
+    log_set_level((log_level_t)lv);
+    dprintf(fd, "ok: log level set to %s\n", arg);
+}
+
 static void cmd_rescan(int fd) {
     service_def_t **defs = NULL;
     int count = service_load_dir(SERVICES_DIR, &defs);
@@ -216,6 +226,11 @@ void control_handle_data(int listen_fd) {
         if (strcmp(cmd, "status") == 0) cmd_status(fd);
         else if (strcmp(cmd, "list") == 0) cmd_list(fd);
         else if (strcmp(cmd, "rescan") == 0) cmd_rescan(fd);
+        else if (strcmp(cmd, "loglevel") == 0) {
+            char *arg = strtok(NULL, " \n\r");
+            if (arg) cmd_loglevel(fd, arg);
+            else dprintf(fd, "err: missing log level\n");
+        }
         else if (strcmp(cmd, "start") == 0 || strcmp(cmd, "stop") == 0 ||
                  strcmp(cmd, "restart") == 0 || strcmp(cmd, "reload") == 0 ||
                  strcmp(cmd, "enable") == 0 || strcmp(cmd, "disable") == 0) {

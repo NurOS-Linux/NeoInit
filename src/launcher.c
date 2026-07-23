@@ -7,11 +7,32 @@
 #include "reap.h"
 
 #include <errno.h>
+#include <fcntl.h>
 #include <paths.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
+
+#define SERVICE_LOG_DIR "/var/log/raesir"
+
+static void redirect_output(const service_def_t *def) {
+    char path[512];
+
+    mkdir("/var/log", 0755);
+    mkdir(SERVICE_LOG_DIR, 0755);
+
+    snprintf(path, sizeof(path), SERVICE_LOG_DIR "/%s.log", def->name);
+
+    int fd = open(path, O_WRONLY | O_CREAT | O_APPEND, 0640);
+    if (fd < 0) return;
+
+    dup2(fd, STDOUT_FILENO);
+    dup2(fd, STDERR_FILENO);
+    if (fd > STDERR_FILENO) close(fd);
+}
 
 pid_t service_launch(const service_def_t *def) {
     if (!def || !def->argv || !def->argv[0]) {
@@ -42,6 +63,8 @@ pid_t service_launch(const service_def_t *def) {
             for (int i = 0; def->env[i]; i++)
                 putenv(def->env[i]);
         }
+
+        redirect_output(def);
 
         execv(def->argv[0], def->argv);
         _exit(127);
