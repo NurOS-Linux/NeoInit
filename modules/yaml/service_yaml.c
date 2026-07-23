@@ -104,6 +104,10 @@ service_def_t *service_parse_yaml(const char *path) {
             def->working_dir = strdup(val);
         } else if (strcmp(key, "restart") == 0) {
             def->restart = (strcmp(val, "true") == 0 || strcmp(val, "yes") == 0 || strcmp(val, "1") == 0);
+        } else if (strcmp(key, "restart_delay_ms") == 0) {
+            def->restart_delay_ms = atoi(val);
+        } else if (strcmp(key, "restart_max") == 0) {
+            def->restart_max = atoi(val);
         } else if (strcmp(key, "type") == 0) {
             if (strcmp(val, "oneshot") == 0)
                 def->type = SERVICE_TYPE_ONESHOT;

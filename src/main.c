@@ -47,13 +47,26 @@ static void do_halt(int cmd) {
 }
 
 static void on_service_restart(service_entry_t *ent) {
+    if (!ent->enabled) return;
+
+    if (ent->def->restart_max > 0 &&
+        ent->restart_count >= ent->def->restart_max) {
+        log_warn("%s: restart limit (%d) reached, giving up",
+                 ent->def->name, ent->def->restart_max);
+        return;
+    }
+
     log_info("restarting service: %s", ent->def->name);
-    usleep(100000); /* 100ms throttle */
+
+    if (ent->def->restart_delay_ms > 0)
+        usleep((useconds_t)ent->def->restart_delay_ms * 1000);
+
     pid_t pid = service_launch(ent->def);
     if (pid > 0) {
         log_info("restarted %s [pid %d]", ent->def->name, (int)pid);
         ent->pid = pid;
         ent->running = 1;
+        ent->restart_count++;
     } else {
         log_err("failed to restart %s", ent->def->name);
     }

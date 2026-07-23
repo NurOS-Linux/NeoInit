@@ -116,6 +116,10 @@ service_def_t *service_parse_sd(const char *path) {
                 def->env = service_strv_append(def->env, val);
             } else if (strcmp(key, "Restart") == 0) {
                 def->restart = (strcmp(val, "no") != 0);
+            } else if (strcmp(key, "RestartSec") == 0) {
+                def->restart_delay_ms = (int)(atof(val) * 1000.0);
+            } else if (strcmp(key, "StartLimitBurst") == 0) {
+                def->restart_max = atoi(val);
             } else if (strcmp(key, "Type") == 0) {
                 if (strcmp(val, "oneshot") == 0)
                     def->type = SERVICE_TYPE_ONESHOT;

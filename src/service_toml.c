@@ -181,6 +181,10 @@ service_def_t *service_parse_toml(const char *path) {
             }
         } else if (strcmp(key, "restart") == 0) {
             def->restart = (strcmp(val, "true") == 0);
+        } else if (strcmp(key, "restart_delay_ms") == 0) {
+            def->restart_delay_ms = atoi(val);
+        } else if (strcmp(key, "restart_max") == 0) {
+            def->restart_max = atoi(val);
         } else if (strcmp(key, "type") == 0) {
             if (str_val && strcmp(str_val, "oneshot") == 0)
                 def->type = SERVICE_TYPE_ONESHOT;

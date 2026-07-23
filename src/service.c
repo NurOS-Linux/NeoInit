@@ -14,6 +14,10 @@
 
 service_def_t *service_alloc(void) {
     service_def_t *def = calloc(1, sizeof(*def));
+    if (def) {
+        def->restart_delay_ms = 100;
+        def->restart_max      = 0;
+    }
     return def;
 }
 

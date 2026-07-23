@@ -5,7 +5,9 @@
 #include "control.h"
 #include "log.h"
 #include "launcher.h"
+#include "reap.h"
 #include "registry.h"
+#include "service.h"
 
 #include <errno.h>
 #include <signal.h>
@@ -14,6 +16,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 int control_init(void) {
@@ -68,6 +71,10 @@ static void cmd_start(int fd, const char *name) {
         dprintf(fd, "err: service '%s' not found\n", name);
         return;
     }
+    if (!ent->enabled) {
+        dprintf(fd, "err: service '%s' is disabled\n", name);
+        return;
+    }
     if (ent->running) {
         dprintf(fd, "err: service '%s' already running\n", name);
         return;
@@ -76,10 +83,120 @@ static void cmd_start(int fd, const char *name) {
     if (pid > 0) {
         ent->pid = pid;
         ent->running = 1;
+        ent->restart_count = 0;
         dprintf(fd, "ok: started %s [pid %d]\n", name, pid);
     } else {
         dprintf(fd, "err: failed to launch %s\n", name);
     }
+}
+
+static int stop_and_wait(service_entry_t *ent) {
+    pid_t pid = ent->pid;
+
+    if (kill(pid, SIGTERM) < 0)
+        return -1;
+
+    int waited_ms = 0;
+    for (;;) {
+        pid_t r = waitpid(pid, NULL, WNOHANG);
+        if (r == pid || (r < 0 && errno == ECHILD))
+            break;
+        if (waited_ms >= 5000) {
+            kill(pid, SIGKILL);
+            waitpid(pid, NULL, 0);
+            break;
+        }
+        usleep(100000);
+        waited_ms += 100;
+    }
+
+    reap_untrack(pid);
+    ent->running = 0;
+    ent->pid = -1;
+    return 0;
+}
+
+static void cmd_restart(int fd, const char *name) {
+    service_entry_t *ent = registry_find(name);
+    if (!ent) {
+        dprintf(fd, "err: service '%s' not found\n", name);
+        return;
+    }
+    if (!ent->enabled) {
+        dprintf(fd, "err: service '%s' is disabled\n", name);
+        return;
+    }
+    if (ent->running && ent->pid > 0) {
+        if (stop_and_wait(ent) < 0) {
+            dprintf(fd, "err: kill: %s\n", strerror(errno));
+            return;
+        }
+    }
+    pid_t pid = service_launch(ent->def);
+    if (pid > 0) {
+        ent->pid = pid;
+        ent->running = 1;
+        ent->restart_count = 0;
+        dprintf(fd, "ok: restarted %s [pid %d]\n", name, pid);
+    } else {
+        dprintf(fd, "err: failed to launch %s\n", name);
+    }
+}
+
+static void cmd_reload(int fd, const char *name) {
+    service_entry_t *ent = registry_find(name);
+    if (!ent) {
+        dprintf(fd, "err: service '%s' not found\n", name);
+        return;
+    }
+    if (!ent->running || ent->pid <= 0) {
+        dprintf(fd, "err: service '%s' not running\n", name);
+        return;
+    }
+    if (kill(ent->pid, SIGHUP) < 0) {
+        dprintf(fd, "err: kill: %s\n", strerror(errno));
+    } else {
+        dprintf(fd, "ok: reload signal sent to %s\n", name);
+    }
+}
+
+static void cmd_enable(int fd, const char *name) {
+    service_entry_t *ent = registry_find(name);
+    if (!ent) {
+        dprintf(fd, "err: service '%s' not found\n", name);
+        return;
+    }
+    ent->enabled = 1;
+    dprintf(fd, "ok: enabled %s\n", name);
+}
+
+static void cmd_disable(int fd, const char *name) {
+    service_entry_t *ent = registry_find(name);
+    if (!ent) {
+        dprintf(fd, "err: service '%s' not found\n", name);
+        return;
+    }
+    ent->enabled = 0;
+    dprintf(fd, "ok: disabled %s\n", name);
+}
+
+static void cmd_rescan(int fd) {
+    service_def_t **defs = NULL;
+    int count = service_load_dir(SERVICES_DIR, &defs);
+    int added = 0;
+
+    for (int i = 0; i < count; i++) {
+        if (registry_find(defs[i]->name)) {
+            service_free(defs[i]);
+        } else if (registry_add(defs[i]) == 0) {
+            added++;
+        } else {
+            service_free(defs[i]);
+        }
+    }
+    free(defs);
+
+    dprintf(fd, "ok: %d new service(s) registered\n", added);
 }
 
 void control_handle_data(int listen_fd) {
@@ -98,15 +215,26 @@ void control_handle_data(int listen_fd) {
 
         if (strcmp(cmd, "status") == 0) cmd_status(fd);
         else if (strcmp(cmd, "list") == 0) cmd_list(fd);
-        else if (strcmp(cmd, "start") == 0) {
+        else if (strcmp(cmd, "rescan") == 0) cmd_rescan(fd);
+        else if (strcmp(cmd, "start") == 0 || strcmp(cmd, "stop") == 0 ||
+                 strcmp(cmd, "restart") == 0 || strcmp(cmd, "reload") == 0 ||
+                 strcmp(cmd, "enable") == 0 || strcmp(cmd, "disable") == 0) {
             char *arg = strtok(NULL, " \n\r");
-            if (arg) cmd_start(fd, arg);
-            else dprintf(fd, "err: missing service name\n");
-        }
-        else if (strcmp(cmd, "stop") == 0) {
-            char *arg = strtok(NULL, " \n\r");
-            if (arg) cmd_stop(fd, arg);
-            else dprintf(fd, "err: missing service name\n");
+            if (!arg) {
+                dprintf(fd, "err: missing service name\n");
+            } else if (strcmp(cmd, "start") == 0) {
+                cmd_start(fd, arg);
+            } else if (strcmp(cmd, "stop") == 0) {
+                cmd_stop(fd, arg);
+            } else if (strcmp(cmd, "restart") == 0) {
+                cmd_restart(fd, arg);
+            } else if (strcmp(cmd, "reload") == 0) {
+                cmd_reload(fd, arg);
+            } else if (strcmp(cmd, "enable") == 0) {
+                cmd_enable(fd, arg);
+            } else {
+                cmd_disable(fd, arg);
+            }
         }
         else dprintf(fd, "err: unknown command\n");
     }

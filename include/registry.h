@@ -12,6 +12,8 @@ typedef struct {
     pid_t          pid;
     int            running;
     int            exit_ok;
+    int            enabled;
+    int            restart_count;
 } service_entry_t;
 
 void             registry_init(void);

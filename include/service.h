@@ -17,6 +17,8 @@ typedef struct {
     char          *working_dir;
     service_type_t type;
     int            restart;     /* 1 = restart on failure                     */
+    int            restart_delay_ms;
+    int            restart_max;
     char         **after;       /* NULL-terminated service names, ordering only        */
     char         **requires;    /* NULL-terminated service names, hard dependency      */
     char         **wants;       /* NULL-terminated service names, weak dependency      */
