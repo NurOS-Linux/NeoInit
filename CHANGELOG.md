@@ -5,13 +5,71 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.0.0] - 2026-07-23
+
+### Added
+
+- End-to-end integration test covering TOML, YAML and systemd definitions,
+  dependency leveling, registry state and real process launch
+- `raesir(8)` man page
+- Versioned control socket protocol; `protocol` command reports the current
+  version (1)
+- Security hardening: control socket mode 0600 and peer credential
+  verification via `SO_PEERCRED`
+
+### Fixed
+
+- Restart policy no longer resurrects services stopped manually via
+  `servctl stop`
+
+## [0.6.0] - 2026-07-23
+
+### Added
+
+- TTY allocation for console services: `tty` key in TOML/YAML, `TTYPath=` in
+  `.service` units; the service gets its own session and controlling terminal
+- getty-style respawn for console login services when combined with `restart`
+
+## [0.5.0] - 2026-07-23
+
+### Added
+
+- Each service runs in its own cgroup v2 under `/sys/fs/cgroup/raesir`
+- Memory and CPU limits: `memory_max` and `cpu_weight` keys in TOML/YAML,
+  `MemoryMax=` and `CPUWeight=` in `.service` units
+- Clean cgroup teardown when a service exits or is stopped
+
+## [0.4.0] - 2026-07-23
+
+### Added
+
+- File-based logging to `/var/log/raesir.log` with size-based rotation
+- Per-service stdout/stderr capture to `/var/log/raesir/<name>.log`
+- Runtime log level filtering via the `loglevel` control command
+- Optional structured log output (key=value pairs)
+
+## [0.3.0] - 2026-07-23
+
+### Added
+
+- `servctl restart <name>` with graceful SIGTERM/SIGKILL escalation
+- `servctl reload <name>` sends `SIGHUP` to a running service
+- Runtime `enable`/`disable` without editing definition files
+- `rescan` command loads new service definitions at runtime
+- Configurable restart delay (`restart_delay_ms`, `RestartSec=`) and restart
+  limit (`restart_max`, `StartLimitBurst=`) per service
+
+## [0.2.0] - 2026-07-23
 
 ### Added
 
 - Service dependency declarations: `after` and `requires` fields in YAML;
-  `After=`, `Requires=` and `Wants=` in `.service` files. Parsed and stored
-  on the service definition; not yet enforced at startup (see ROADMAP.md)
+  `After=`, `Requires=` and `Wants=` in `.service` files
+- Topological dependency leveling at startup with cycle detection
+- Parallel startup of independent services within the same level
+- `wants` weak dependencies that do not block dependents on failure
+- Hard `requires` enforcement: dependents are skipped when a required
+  dependency failed to start
 
 ## [0.1.0] - 2026-04-20
 

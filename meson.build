@@ -1,5 +1,5 @@
 project('raesir', 'c',
-  version : '0.1.0-alpha2',
+  version : '1.0.0',
   default_options : [
     'c_std=c11',
     'warning_level=2',
