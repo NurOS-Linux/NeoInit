@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <sys/un.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -32,6 +33,7 @@ int control_init(void) {
         return -1;
     }
     listen(fd, 5);
+    chmod(RAESIR_SOCK_PATH, 0600);
     return fd;
 }
 
@@ -219,6 +221,15 @@ void control_handle_data(int listen_fd) {
     int fd = accept4(listen_fd, NULL, NULL, SOCK_CLOEXEC);
     if (fd < 0) return;
 
+    struct ucred cred;
+    socklen_t cred_len = sizeof(cred);
+    if (getsockopt(fd, SOL_SOCKET, SO_PEERCRED, &cred, &cred_len) == 0 &&
+        cred.uid != 0 && cred.uid != getuid()) {
+        dprintf(fd, "err: permission denied\n");
+        close(fd);
+        return;
+    }
+
     char buf[512];
     ssize_t n = read(fd, buf, sizeof(buf) - 1);
     if (n > 0) {
@@ -231,6 +242,8 @@ void control_handle_data(int listen_fd) {
 
         if (strcmp(cmd, "status") == 0) cmd_status(fd);
         else if (strcmp(cmd, "list") == 0) cmd_list(fd);
+        else if (strcmp(cmd, "protocol") == 0)
+            dprintf(fd, "ok: raesir-protocol %d\n", RAESIR_PROTOCOL_VERSION);
         else if (strcmp(cmd, "rescan") == 0) cmd_rescan(fd);
         else if (strcmp(cmd, "loglevel") == 0) {
             char *arg = strtok(NULL, " \n\r");

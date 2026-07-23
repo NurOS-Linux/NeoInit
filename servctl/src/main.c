@@ -21,6 +21,8 @@ static void usage(const char *progname) {
     fprintf(stderr, "  enable <name>  Allow a service to be started and auto-restarted\n");
     fprintf(stderr, "  disable <name> Block a service from starting or auto-restarting\n");
     fprintf(stderr, "  rescan         Load new service definitions from disk\n");
+    fprintf(stderr, "  loglevel <lvl> Set daemon log level (info, warn, err)\n");
+    fprintf(stderr, "  protocol       Report control socket protocol version\n");
 }
 
 int main(int argc, char *argv[]) {

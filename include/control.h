@@ -5,6 +5,7 @@
 #pragma once
 
 #define RAESIR_SOCK_PATH "/run/raesir.sock"
+#define RAESIR_PROTOCOL_VERSION 1
 
 int control_init(void);
 void control_handle_data(int listen_fd);
