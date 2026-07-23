@@ -51,3 +51,5 @@ endif
 
 subdir('src')
 subdir('tests')
+
+install_man('man/raesir.8')
