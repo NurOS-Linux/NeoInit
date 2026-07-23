@@ -40,6 +40,8 @@ char **service_strv_append(char **v, const char *val);
  */
 int service_load_dir(const char *dir, service_def_t ***out);
 
+int service_name_valid(const char *name);
+
 /* Shared argv builder used by all parsers */
 char **service_parse_argv(const char *cmd);
 

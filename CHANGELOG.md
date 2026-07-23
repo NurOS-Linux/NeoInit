@@ -21,6 +21,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Restart policy no longer resurrects services stopped manually via
   `servctl stop`
+- Service names are validated before registration: names containing path
+  separators, whitespace, `.`/`..` or longer than 63 characters are rejected,
+  preventing path traversal into log and cgroup directories
+- Control socket connections now carry receive/send timeouts so an idle
+  client can no longer block the init main loop indefinitely
 
 ## [0.6.0] - 2026-07-23
 

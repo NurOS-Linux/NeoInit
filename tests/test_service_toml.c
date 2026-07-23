@@ -102,5 +102,15 @@ int main(void) {
     unlink(path); free(path);
     CHECK(def == NULL);
 
+    CHECK(service_name_valid("web") == 1);
+    CHECK(service_name_valid("a-b_c.1") == 1);
+    CHECK(service_name_valid(NULL) == 0);
+    CHECK(service_name_valid("") == 0);
+    CHECK(service_name_valid("a/b") == 0);
+    CHECK(service_name_valid("../evil") == 0);
+    CHECK(service_name_valid("..") == 0);
+    CHECK(service_name_valid("has space") == 0);
+    CHECK(service_name_valid("this-name-is-way-too-long-to-be-used-as-a-service-identifier-here") == 0);
+
     TEST_DONE();
 }

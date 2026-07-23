@@ -53,6 +53,9 @@ int main(void) {
         "[Service]\n"
         "ExecStart=/usr/bin/true\n"
         "Type=oneshot\n");
+    write_def(dir, "evil.toml",
+        "name = \"../evil\"\n"
+        "exec = \"/usr/bin/true\"\n");
 
     service_def_t **defs = NULL;
     int count = service_load_dir(dir, &defs);
@@ -101,8 +104,8 @@ int main(void) {
     CHECK(found == NULL || found->pid == -1);
 
     char path[512];
-    const char *names[] = { "base.toml", "app.toml", "compat.service" };
-    for (int i = 0; i < 3; i++) {
+    const char *names[] = { "base.toml", "app.toml", "compat.service", "evil.toml" };
+    for (int i = 0; i < 4; i++) {
         snprintf(path, sizeof(path), "%s/%s", dir, names[i]);
         unlink(path);
     }
