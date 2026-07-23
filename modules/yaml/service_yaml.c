@@ -105,6 +105,9 @@ service_def_t *service_parse_yaml(const char *path) {
         } else if (strcmp(key, "memory_max") == 0) {
             free(def->memory_max);
             def->memory_max = strdup(val);
+        } else if (strcmp(key, "tty") == 0) {
+            free(def->tty);
+            def->tty = strdup(val);
         } else if (strcmp(key, "cpu_weight") == 0) {
             def->cpu_weight = atoi(val);
         } else if (strcmp(key, "restart") == 0) {

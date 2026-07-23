@@ -21,6 +21,7 @@ typedef struct {
     int            restart_max;
     char          *memory_max;
     int            cpu_weight;
+    char          *tty;
     char         **after;       /* NULL-terminated service names, ordering only        */
     char         **requires;    /* NULL-terminated service names, hard dependency      */
     char         **wants;       /* NULL-terminated service names, weak dependency      */

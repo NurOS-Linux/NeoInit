@@ -6,6 +6,7 @@
 #include "cgroup.h"
 #include "log.h"
 #include "reap.h"
+#include "tty.h"
 
 #include <errno.h>
 #include <fcntl.h>
@@ -65,7 +66,12 @@ pid_t service_launch(const service_def_t *def) {
                 putenv(def->env[i]);
         }
 
-        redirect_output(def);
+        if (def->tty) {
+            if (tty_setup(def->tty) < 0)
+                _exit(126);
+        } else {
+            redirect_output(def);
+        }
 
         execv(def->argv[0], def->argv);
         _exit(127);

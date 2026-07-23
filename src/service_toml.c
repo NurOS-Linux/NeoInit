@@ -185,6 +185,12 @@ service_def_t *service_parse_toml(const char *path) {
                 def->memory_max = str_val;
                 str_val         = NULL;
             }
+        } else if (strcmp(key, "tty") == 0) {
+            if (str_val) {
+                free(def->tty);
+                def->tty = str_val;
+                str_val  = NULL;
+            }
         } else if (strcmp(key, "cpu_weight") == 0) {
             def->cpu_weight = atoi(val);
         } else if (strcmp(key, "restart") == 0) {

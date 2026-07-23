@@ -3,6 +3,7 @@ raesir_lib_sources = files(
   'cgroup.c',
   'launcher.c',
   'log.c',
+  'tty.c',
   'mount.c',
   'order.c',
   'reap.c',

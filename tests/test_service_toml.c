@@ -20,6 +20,7 @@ static const char *toml_full =
     "restart_max = 5\n"
     "memory_max = \"128M\"\n"
     "cpu_weight = 200\n"
+    "tty = \"tty2\"\n"
     "type = \"oneshot\"\n"
     "env = [\n"
     "  \"FOO=bar\",\n"
@@ -64,6 +65,7 @@ int main(void) {
     CHECK(def->restart_max == 5);
     CHECK(def->memory_max != NULL && strcmp(def->memory_max, "128M") == 0);
     CHECK(def->cpu_weight == 200);
+    CHECK(def->tty != NULL && strcmp(def->tty, "tty2") == 0);
     CHECK(def->type == SERVICE_TYPE_ONESHOT);
     CHECK(def->env != NULL);
     CHECK(strcmp(def->env[0], "FOO=bar") == 0);
@@ -88,6 +90,7 @@ int main(void) {
     CHECK(def->restart_max == 0);
     CHECK(def->memory_max == NULL);
     CHECK(def->cpu_weight == 0);
+    CHECK(def->tty == NULL);
     CHECK(def->type == SERVICE_TYPE_SIMPLE);
     CHECK(def->after == NULL);
     CHECK(def->requires == NULL);

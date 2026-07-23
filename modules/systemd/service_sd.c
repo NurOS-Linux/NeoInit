@@ -117,6 +117,9 @@ service_def_t *service_parse_sd(const char *path) {
             } else if (strcmp(key, "MemoryMax") == 0) {
                 free(def->memory_max);
                 def->memory_max = strdup(val);
+            } else if (strcmp(key, "TTYPath") == 0) {
+                free(def->tty);
+                def->tty = strdup(val);
             } else if (strcmp(key, "CPUWeight") == 0) {
                 def->cpu_weight = atoi(val);
             } else if (strcmp(key, "Restart") == 0) {
