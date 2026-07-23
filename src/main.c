@@ -6,6 +6,7 @@
 #include "launcher.h"
 #include "log.h"
 #include "mount.h"
+#include "order.h"
 #include "reap.h"
 #include "registry.h"
 #include "service.h"
@@ -58,6 +59,100 @@ static void on_service_restart(service_entry_t *ent) {
     }
 }
 
+static int deps_satisfied(const service_def_t *def) {
+    if (!def->requires) return 1;
+    for (int i = 0; def->requires[i]; i++) {
+        service_entry_t *dep = registry_find(def->requires[i]);
+        if (!dep) return 0;
+        if (dep->running) continue;
+        if (dep->def->type == SERVICE_TYPE_ONESHOT && dep->exit_ok) continue;
+        return 0;
+    }
+    return 1;
+}
+
+static void wait_oneshot(service_entry_t *ent) {
+    int status = 0;
+
+    for (;;) {
+        if (waitpid(ent->pid, &status, 0) < 0) {
+            if (errno == EINTR) continue;
+            log_err("waitpid %s: %s", ent->def->name, strerror(errno));
+            break;
+        }
+        break;
+    }
+
+    if (WIFEXITED(status)) {
+        log_info("%s exited with %d", ent->def->name, WEXITSTATUS(status));
+        ent->exit_ok = (WEXITSTATUS(status) == 0);
+    } else if (WIFSIGNALED(status)) {
+        log_warn("%s killed by signal %d", ent->def->name, WTERMSIG(status));
+        ent->exit_ok = 0;
+    }
+
+    ent->running = 0;
+    ent->pid = -1;
+}
+
+static void start_all_services(void) {
+    service_def_t **defs = NULL;
+    int count = service_load_dir(SERVICES_DIR, &defs);
+    if (count <= 0) {
+        free(defs);
+        return;
+    }
+
+    int *levels = calloc((size_t)count, sizeof(int));
+    if (!levels) {
+        free(defs);
+        return;
+    }
+
+    int nlevels = order_levels(defs, count, levels);
+    if (nlevels < 0) {
+        free(levels);
+        free(defs);
+        return;
+    }
+
+    for (int i = 0; i < count; i++)
+        registry_add(defs[i]);
+
+    for (int lv = 0; lv < nlevels; lv++) {
+        for (int i = 0; i < count; i++) {
+            if (levels[i] != lv) continue;
+
+            service_entry_t *ent = registry_find(defs[i]->name);
+            if (!ent) continue;
+
+            if (!deps_satisfied(defs[i])) {
+                log_err("skipping %s: unmet dependencies", defs[i]->name);
+                continue;
+            }
+
+            pid_t pid = service_launch(defs[i]);
+            if (pid > 0) {
+                ent->pid = pid;
+                ent->running = 1;
+            }
+        }
+
+        for (int i = 0; i < count; i++) {
+            if (levels[i] != lv) continue;
+            if (defs[i]->type != SERVICE_TYPE_ONESHOT) continue;
+
+            service_entry_t *ent = registry_find(defs[i]->name);
+            if (!ent || !ent->running) continue;
+
+            wait_oneshot(ent);
+        }
+    }
+
+    free(levels);
+    free(defs);
+}
+
 int main(void) {
     if (getpid() != 1) {
         fprintf(stderr, "raesir: must run as PID 1\n");
@@ -73,40 +168,7 @@ int main(void) {
 
     int ctrl_fd = control_init();
 
-    service_def_t **defs = NULL;
-    int count = service_load_dir(SERVICES_DIR, &defs);
-    if (count > 0) {
-        for (int i = 0; i < count; i++) {
-            registry_add(defs[i]);
-            pid_t pid = service_launch(defs[i]);
-            service_entry_t *ent = NULL;
-            if (pid > 0) {
-                ent = registry_find(defs[i]->name);
-                if (ent) {
-                    ent->pid = pid;
-                    ent->running = 1;
-                }
-            }
-
-            if (defs[i]->type == SERVICE_TYPE_ONESHOT && pid > 0) {
-                int status;
-                waitpid_t:
-                if (waitpid(pid, &status, 0) < 0) {
-                    if (errno == EINTR) goto waitpid_t;
-                    log_err("waitpid %s: %s", defs[i]->name, strerror(errno));
-                }
-                if (WIFEXITED(status))
-                    log_info("%s exited with %d", defs[i]->name, WEXITSTATUS(status));
-                else if (WIFSIGNALED(status))
-                    log_warn("%s killed by signal %d", defs[i]->name, WTERMSIG(status));
-                if (ent) {
-                    ent->running = 0;
-                    ent->pid = -1;
-                }
-            }
-        }
-        free(defs);
-    }
+    start_all_services();
 
     log_info("entering main loop");
 
