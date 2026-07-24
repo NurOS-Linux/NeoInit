@@ -16,6 +16,11 @@ static const char *toml_full =
     "exec = \"/usr/bin/echo hello world\"\n"
     "working_dir = \"/tmp\"\n"
     "restart = true\n"
+    "restart_delay_ms = 250\n"
+    "restart_max = 5\n"
+    "memory_max = \"128M\"\n"
+    "cpu_weight = 200\n"
+    "tty = \"tty2\"\n"
     "type = \"oneshot\"\n"
     "env = [\n"
     "  \"FOO=bar\",\n"
@@ -56,6 +61,11 @@ int main(void) {
     CHECK(def->argv[3] == NULL);
     CHECK(def->working_dir != NULL && strcmp(def->working_dir, "/tmp") == 0);
     CHECK(def->restart == 1);
+    CHECK(def->restart_delay_ms == 250);
+    CHECK(def->restart_max == 5);
+    CHECK(def->memory_max != NULL && strcmp(def->memory_max, "128M") == 0);
+    CHECK(def->cpu_weight == 200);
+    CHECK(def->tty != NULL && strcmp(def->tty, "tty2") == 0);
     CHECK(def->type == SERVICE_TYPE_ONESHOT);
     CHECK(def->env != NULL);
     CHECK(strcmp(def->env[0], "FOO=bar") == 0);
@@ -76,6 +86,11 @@ int main(void) {
     CHECK(def != NULL);
     CHECK(def->name != NULL);
     CHECK(def->restart == 0);
+    CHECK(def->restart_delay_ms == 100);
+    CHECK(def->restart_max == 0);
+    CHECK(def->memory_max == NULL);
+    CHECK(def->cpu_weight == 0);
+    CHECK(def->tty == NULL);
     CHECK(def->type == SERVICE_TYPE_SIMPLE);
     CHECK(def->after == NULL);
     CHECK(def->requires == NULL);
@@ -86,6 +101,16 @@ int main(void) {
     def = service_parse_toml(path);
     unlink(path); free(path);
     CHECK(def == NULL);
+
+    CHECK(service_name_valid("web") == 1);
+    CHECK(service_name_valid("a-b_c.1") == 1);
+    CHECK(service_name_valid(NULL) == 0);
+    CHECK(service_name_valid("") == 0);
+    CHECK(service_name_valid("a/b") == 0);
+    CHECK(service_name_valid("../evil") == 0);
+    CHECK(service_name_valid("..") == 0);
+    CHECK(service_name_valid("has space") == 0);
+    CHECK(service_name_valid("this-name-is-way-too-long-to-be-used-as-a-service-identifier-here") == 0);
 
     TEST_DONE();
 }

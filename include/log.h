@@ -14,6 +14,10 @@ typedef enum {
 
 void log_init(void);
 void log_close(void);
+void log_set_level(log_level_t level);
+log_level_t log_get_level(void);
+void log_set_structured(int on);
+int log_level_from_str(const char *s);
 void log_msg(log_level_t level, const char *fmt, ...)
     __attribute__((format(printf, 2, 3)));
 

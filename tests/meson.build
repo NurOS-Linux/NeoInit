@@ -5,7 +5,9 @@ tests = {
   'test_mount'        : { 'src': 'test_mount.c',        'cargs': [] },
   'test_reap'         : { 'src': 'test_reap.c',         'cargs': [] },
   'test_argv'         : { 'src': 'test_argv.c',         'cargs': [] },
+  'test_order'        : { 'src': 'test_order.c',        'cargs': [] },
   'test_service_toml' : { 'src': 'test_service_toml.c', 'cargs': [] },
+  'test_integration'  : { 'src': 'test_integration.c',  'cargs': [] },
 }
 
 if get_option('systemd_compat')

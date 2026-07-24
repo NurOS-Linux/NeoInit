@@ -1,0 +1,113 @@
+.TH RAESIR 8 "2026" "raesir 1.0.0" "System Administration"
+.SH NAME
+raesir \- lightweight init system and service manager
+.SH SYNOPSIS
+.B raesir
+.SH DESCRIPTION
+.B raesir
+is a minimal init system designed to run as PID 1. It mounts essential
+filesystems, launches services in dependency order, reaps zombie processes,
+applies cgroup v2 resource limits and exposes a Unix socket control
+interface.
+.PP
+Service definitions are read from
+.I /etc/raesir/services
+in TOML format. YAML definitions and systemd
+.I .service
+units are supported when the corresponding compatibility modules are enabled
+at build time.
+.SH SERVICE DEFINITION KEYS
+.TP
+.B name
+Service name. Defaults to the file name without extension.
+.TP
+.B description
+Human readable description.
+.TP
+.B exec
+Command line to execute. Required.
+.TP
+.B working_dir
+Working directory for the service process.
+.TP
+.B env
+List of KEY=VALUE environment variables.
+.TP
+.B type
+Either
+.B simple
+(default) or
+.BR oneshot .
+.TP
+.B restart
+Restart the service when it exits.
+.TP
+.B restart_delay_ms
+Delay in milliseconds before a restart. Defaults to 100.
+.TP
+.B restart_max
+Maximum number of automatic restarts. 0 means unlimited.
+.TP
+.B after, requires, wants
+Dependency declarations controlling startup order. Services within the same
+dependency level are started in parallel.
+.TP
+.B memory_max, cpu_weight
+Cgroup v2 resource limits written to
+.I memory.max
+and
+.IR cpu.weight .
+.TP
+.B tty
+Terminal device for console services. The service receives its own session
+and controlling terminal, enabling getty-style respawn together with
+.BR restart .
+.SH SIGNALS
+.TP
+.B SIGTERM
+Power off the system.
+.TP
+.B SIGINT
+Reboot the system.
+.TP
+.B SIGCHLD
+Reap terminated children and apply restart policy.
+.SH LOGGING
+Messages are written to
+.IR /dev/kmsg ,
+to
+.I /var/log/raesir.log
+with size-based rotation, and per-service output is captured in
+.IR /var/log/raesir/<name>.log .
+.SH CONTROL INTERFACE
+A Unix domain socket at
+.I /run/raesir.sock
+accepts the commands
+.BR status ,
+.BR list ,
+.BR start ,
+.BR stop ,
+.BR restart ,
+.BR reload ,
+.BR enable ,
+.BR disable ,
+.BR rescan ,
+.B loglevel
+and
+.BR protocol .
+The socket is owned by root with mode 0600 and peer credentials are
+verified. The protocol is versioned; the current version is 1.
+.SH FILES
+.TP
+.I /etc/raesir/services
+Service definition directory.
+.TP
+.I /run/raesir.sock
+Control socket.
+.TP
+.I /var/log/raesir.log
+Daemon log file.
+.SH SEE ALSO
+.BR servctl (1)
+.SH AUTHOR
+meigoc (https://github.com/meigoc)

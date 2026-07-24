@@ -17,6 +17,11 @@ typedef struct {
     char          *working_dir;
     service_type_t type;
     int            restart;     /* 1 = restart on failure                     */
+    int            restart_delay_ms;
+    int            restart_max;
+    char          *memory_max;
+    int            cpu_weight;
+    char          *tty;
     char         **after;       /* NULL-terminated service names, ordering only        */
     char         **requires;    /* NULL-terminated service names, hard dependency      */
     char         **wants;       /* NULL-terminated service names, weak dependency      */
@@ -34,6 +39,8 @@ char **service_strv_append(char **v, const char *val);
  * Returns number of loaded definitions, -1 on hard error.
  */
 int service_load_dir(const char *dir, service_def_t ***out);
+
+int service_name_valid(const char *name);
 
 /* Shared argv builder used by all parsers */
 char **service_parse_argv(const char *cmd);

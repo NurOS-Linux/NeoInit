@@ -14,6 +14,10 @@
 
 service_def_t *service_alloc(void) {
     service_def_t *def = calloc(1, sizeof(*def));
+    if (def) {
+        def->restart_delay_ms = 100;
+        def->restart_max      = 0;
+    }
     return def;
 }
 
@@ -29,6 +33,8 @@ void service_free(service_def_t *def) {
     free(def->name);
     free(def->description);
     free(def->working_dir);
+    free(def->memory_max);
+    free(def->tty);
     free_strv(def->argv);
     free_strv(def->env);
     free_strv(def->after);
@@ -92,6 +98,27 @@ static const char *file_ext(const char *name) {
     return dot ? dot + 1 : "";
 }
 
+int service_name_valid(const char *name) {
+    if (!name || !name[0])
+        return 0;
+
+    size_t len = strlen(name);
+    if (len > 63)
+        return 0;
+
+    if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0)
+        return 0;
+
+    for (size_t i = 0; i < len; i++) {
+        char c = name[i];
+        if (c == '/' || c == '\\' || c == ' ' || c == '\t' ||
+            c == '\n' || c == '\r')
+            return 0;
+    }
+
+    return 1;
+}
+
 int service_load_dir(const char *dir, service_def_t ***out) {
     DIR *d = opendir(dir);
     if (!d) {
@@ -139,6 +166,12 @@ int service_load_dir(const char *dir, service_def_t ***out) {
 
         if (!def) {
             log_warn("failed to parse %s", path);
+            continue;
+        }
+
+        if (!service_name_valid(def->name)) {
+            log_warn("%s: invalid service name, skipping", path);
+            service_free(def);
             continue;
         }
 

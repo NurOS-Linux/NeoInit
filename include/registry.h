@@ -11,6 +11,10 @@ typedef struct {
     service_def_t *def;
     pid_t          pid;
     int            running;
+    int            exit_ok;
+    int            enabled;
+    int            restart_count;
+    int            stop_requested;
 } service_entry_t;
 
 void             registry_init(void);
